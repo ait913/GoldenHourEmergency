@@ -61,7 +61,7 @@ describe('PUT /location', () => {
         ST_Y(location::geometry) as lat,
         ST_X(location::geometry) as lng
       FROM medical_profiles
-      WHERE user_id = ${userId}
+      WHERE "userId" = ${userId}
     `
     expect(result).toHaveLength(1)
     expect(result[0].lat).toBeCloseTo(lat, 4)
