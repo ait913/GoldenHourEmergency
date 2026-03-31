@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  REPORTER
+  MEDICAL
+}
+
+enum EmergencyStatus {
+  PENDING
+  RESPONDING
+  RESOLVED
+  CANCELLED
+}
+
+enum ResponseAction {
+  ACCEPTED
+  DECLINED
+}
+
+model User {
+  id          Int      @id @default(autoincrement())
+  phoneNumber String   @unique
+  name        String?
+  role        UserRole
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  medicalProfile      MedicalProfile?
+  emergenciesReported Emergency[]         @relation("Reporter")
+  responses           EmergencyResponse[]
+
+  @@map("users")
+}
+
+model MedicalProfile {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @unique
+  user        User     @relation(fields: [userId], references: [id])
+  isAvailable Boolean  @default(true)
+  // geography(Point,4326) — PostGIS型のため Unsupported
+  location    Unsupported("geography(Point,4326)")?
+  updatedAt   DateTime @updatedAt
+
+  @@map("medical_profiles")
+}
+
+model Emergency {
+  id         Int             @id @default(autoincrement())
+  reporterId Int
+  reporter   User            @relation("Reporter", fields: [reporterId], references: [id])
+  symptoms   String[]
+  lat        Float
+  lng        Float
+  status     EmergencyStatus @default(PENDING)
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+
+  responses EmergencyResponse[]
+
+  @@map("emergencies")
+}
+
+model EmergencyResponse {
+  id          Int            @id @default(autoincrement())
+  emergencyId Int
+  emergency   Emergency      @relation(fields: [emergencyId], references: [id])
+  responderId Int
+  responder   User           @relation(fields: [responderId], references: [id])
+  action      ResponseAction
+  createdAt   DateTime       @default(now())
+
+  @@unique([emergencyId, responderId])
+  @@map("emergency_responses")
+}
