@@ -55,6 +55,11 @@ export async function sendOtp(phoneNumber: string): Promise<void> {
   // OTPをメモリに保存
   otpStore.set(normalized, { otp, expiresAt })
 
+  // 開発環境ではOTPをログ出力
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`[auth] OTP for ${normalized}: ${otp}`)
+  }
+
   // SMSを送信
   await sendSms(
     normalized,
