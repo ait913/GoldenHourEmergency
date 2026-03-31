@@ -7,6 +7,7 @@ import { responseRoute } from './routes/response'
 import { locationRoute } from './routes/location'
 import { sseRoute } from './routes/sse'
 import { usersRoute } from './routes/users'
+import { aedRoute } from './routes/aed'
 
 export const app = new Hono()
 
@@ -32,6 +33,8 @@ app.route('/emergency', responseRoute)
 app.route('/location', locationRoute)
 app.route('/sse', sseRoute)
 app.route('/users', usersRoute)
+
+app.route('/aed', aedRoute)
 
 // ヘルスチェック
 app.get('/health', (c) => c.json({ status: 'ok' }))

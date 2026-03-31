@@ -1,4 +1,9 @@
 import { defineConfig } from 'vitest/config'
+import { config } from 'dotenv'
+import { resolve } from 'node:path'
+
+// テスト時は .env.test を読み込む
+config({ path: resolve(process.cwd(), '.env.test') })
 
 export default defineConfig({
   test: {
